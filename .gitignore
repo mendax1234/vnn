@@ -1,0 +1,29 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Zensical / static site output
+site/
+
+# Local environment files
+.env
+.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
