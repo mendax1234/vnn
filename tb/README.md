@@ -57,6 +57,3 @@ fixed-point arithmetic before using them for numerical validation.
 The full CNN input file contains the parameter stream followed by ten normalized
 CHW images. Its expected-output file contains ten class indices. HLS first-image
 layer dumps do not supply these full-system fixtures.
-
-Vivado simulation, synthesis, timing, and FPGA measurements have not been
-validated for the current repository configuration.

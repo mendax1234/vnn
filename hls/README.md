@@ -32,12 +32,12 @@ Edit `hls/run_hls.tcl` for your FPGA and timing target:
 | C simulation images | 1 | `num_images`, or `HLS_NUM_IMAGES` |
 | Skip C simulation | 0 | `skip_csim`, or `HLS_SKIP_CSIM` |
 | Tensor directory | `tb/data/` | `mem_dir` |
-| CIFAR-10 input | `data/test_batch.bin` | `cifar_bin` |
+| CIFAR-10 input | `model/test_batch.bin` | `cifar_bin` |
 
 C simulation arguments, when configured manually in the GUI, are:
 
 ```text
-<absolute-path-to-vnn/tb/data> <absolute-path-to-vnn/data/test_batch.bin> <number-of-images>
+<absolute-path-to-vnn/tb/data> <absolute-path-to-vnn/model/test_batch.bin> <number-of-images>
 ```
 
 For a configured Vitis installation, run from the repository root:
@@ -67,6 +67,3 @@ the simulation working directory. Copy them to the locations described in
 [the testbench guide](../tb/README.md). This does not generate the full ten-image
 RTL system fixtures. Additional post-layer dump paths are defined in
 `hls/cnn_accelerator.cpp`; change those output paths if you need those dumps.
-
-C++ syntax checks passed with Vitis headers. Vitis C simulation, synthesis, and
-IP export have not been validated for the current repository configuration.

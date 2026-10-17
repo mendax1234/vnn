@@ -29,8 +29,8 @@ Q6.10. Use `-WeightsHeader PATH` to select another float header. Q6.10 loads
 Run from `model/cuda/` and pass the included data explicitly:
 
 ```powershell
-./build/cnn_fp16.exe 100 ../../data/test_batch.bin 5 3
-./build/cnn_q6_10.exe 100 ../../data/test_batch.bin 5 3 ../weights_q6_10.bin
+./build/cnn_fp16.exe 100 ../test_batch.bin 5 3
+./build/cnn_q6_10.exe 100 ../test_batch.bin 5 3 ../weights_q6_10.bin
 ```
 
 The last two numbers are warm-up images and timed passes. Full positional options:

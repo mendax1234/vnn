@@ -12,7 +12,7 @@ ip      = overlay.cnn_accelerator_0   # packaged from hls/cnn_accelerator.cpp
 
 # ── CIFAR-10 constants ───────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CIFAR_BIN  = REPO_ROOT / "data/test_batch.bin"
+CIFAR_BIN  = REPO_ROOT / "model/test_batch.bin"
 PARAM_BIN  = REPO_ROOT / "model/weights_q6_10.bin"
 
 DEFAULT_NUM_IMAGES = 10000

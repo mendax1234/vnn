@@ -88,14 +88,15 @@ estimates**; they are not measurements of total board power.
 ## Repository structure
 
 ```text
-rtl/          VNN RTL implementation
-hls/          Same-network HLS baseline and Vitis project flow
-tb/rtl/       RTL layer and system testbenches
-tb/hls/       HLS C simulation testbench
-tb/data/      Parameter tensors and simulation-vector locations
-model/        Model definition, checkpoint, exporter, and CPU/CUDA baselines
-pynq/         FPGA board inference applications
-data/         CIFAR-10 binary test batch
+rtl/             VNN RTL implementation
+  interfaces/    AXI-stream image input and result output
+  util/          Shared counter and RTL utilities
+hls/             Same-network HLS baseline and Vitis project flow
+tb/rtl/          RTL layer and system testbenches
+tb/hls/          HLS C simulation testbench
+tb/data/         Parameter tensors and simulation-vector locations
+model/           Model definition, checkpoint, dataset, exporter, and CPU/CUDA baselines
+pynq/            FPGA board inference applications
 ```
 
 Standalone AXI-stream wrappers for the layer testbenches are in
@@ -104,8 +105,11 @@ under ignored `build/` directories.
 
 ## Getting started
 
+The FPGA implementations and PYNQ applications were tested on the AMD Kria KV260
+Vision AI Starter Kit.
+
 Run commands from the repository root unless a component guide specifies another
-working directory. The included evaluation inputs are `data/test_batch.bin`,
+working directory. The included evaluation inputs are `model/test_batch.bin`,
 `model/weights_q6_10.bin`, and fourteen parameter tensors under `tb/data/`.
 The trained checkpoint is `model/checkpoints/cnn.pth`.
 
@@ -118,20 +122,8 @@ The trained checkpoint is `model/checkpoints/cnn.pth`.
 | HLS simulation and synthesis | AMD Vitis HLS | [HLS guide](hls/README.md) |
 | Board execution | Kria KV260/PYNQ environment and matching overlay | [PYNQ guide](pynq/README.md) |
 
-### CPU inference example
-
-The following POSIX-shell commands build the fixed-point CPU baseline and evaluate
-100 images with one warm-up image and one timed pass:
-
-```sh
-mkdir -p model/cpu/build
-g++ -std=c++17 -O2 model/cpu/cnn_fixed.cpp -o model/cpu/build/cnn_fixed
-model/cpu/build/cnn_fixed 100 data/test_batch.bin 1 1 model/weights_q6_10.bin
-```
-
-Use the CPU guide for repeated benchmark runs and the component guides for GPU
-and FPGA execution. Dataset formats and the checksum are in the
-[data guide](data/README.md).
+Build, inference, and benchmark commands are provided in the component guides.
+Dataset formats and the checksum are in the [data guide](model/README.md#evaluation-data).
 
 ## Reproducing the hardware configuration
 
@@ -146,11 +138,7 @@ guide. RTL memory paths are relative to the repository root. Before board
 execution, match overlay paths, IP instance names, control registers, DMA stream
 widths, and image counts to the packaged design using the PYNQ guide.
 
-### Validation and reproduction
-
-The implementations were validated in the FPGA tool flows and on the FPGA board
-for the experiments reported in the paper. This repository organizes the source
-code and evaluation assets used in those experiments.
+### Required artifacts
 
 For reproduction, follow the component guides to configure file paths, FPGA
 settings, overlay/IP names, and board interfaces for your environment. The

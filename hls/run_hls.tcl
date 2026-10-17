@@ -1,7 +1,7 @@
 set script_dir [file dirname [file normalize [info script]]]
 set project_dir [file join $script_dir build]
 set mem_dir [file normalize [file join $script_dir .. tb data]]
-set cifar_bin [file normalize [file join $script_dir .. data test_batch.bin]]
+set cifar_bin [file normalize [file join $script_dir .. model test_batch.bin]]
 
 set part "xck26-sfvc784-2LV-c"
 if {[info exists ::env(HLS_PART)]} { set part $::env(HLS_PART) }

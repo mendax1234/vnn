@@ -12,7 +12,7 @@ included CIFAR-10 test batch and parameter blob.
 | `model/cpu/cnn_fixed.h` | Fixed-point arithmetic and network execution; also used by CUDA Q6.10 |
 | `model/cpu/benchmark.py` | Accuracy and repeated timing reports |
 | `model/weights_q6_10.bin` | 288,298 little-endian signed int16 parameter words |
-| `data/test_batch.bin` | 10,000 CIFAR-10 test images |
+| `model/test_batch.bin` | 10,000 CIFAR-10 test images |
 
 Requires a C++17 compiler. Python 3 is needed only for the benchmark wrapper.
 PYNQ, PyTorch, NumPy, and Vitis are not required for CPU inference.
@@ -24,7 +24,7 @@ compiler:
 
 ```sh
 g++ -std=c++17 -O2 model/cpu/cnn_fixed.cpp -o model/cpu/build/cnn_fixed
-model/cpu/build/cnn_fixed 100 data/test_batch.bin 1 1 model/weights_q6_10.bin
+model/cpu/build/cnn_fixed 100 model/test_batch.bin 1 1 model/weights_q6_10.bin
 ```
 
 On Windows, append `.exe` to the output and executable names. Build on the target
@@ -45,7 +45,7 @@ already exist.
 To report accuracy and timing through the Python wrapper:
 
 ```sh
-python model/cpu/benchmark.py 100 --mode fixed --binary model/cpu/build/cnn_fixed --params model/weights_q6_10.bin --cifar data/test_batch.bin --warmup 5 --repeats 3
+python model/cpu/benchmark.py 100 --mode fixed --binary model/cpu/build/cnn_fixed --params model/weights_q6_10.bin --cifar model/test_batch.bin --warmup 5 --repeats 3
 ```
 
 Change `--binary` for your compiled executable, including `.exe` on Windows.

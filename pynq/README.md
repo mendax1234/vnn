@@ -10,13 +10,13 @@ and deployable overlays are not included.
 | --- | --- | --- | --- |
 | `pynq/infer_rtl.py` | `OVERLAY_PATH` | `/home/ubuntu/hdl/cnn_dataflow.xsa` | Your board's RTL overlay path |
 | `pynq/infer_rtl.py` | `PARAM_BIN` | `/home/ubuntu/weights_q6_10.bin` | Board copy of `model/weights_q6_10.bin` |
-| `pynq/infer_rtl.py` | `CIFAR_BIN` | `/home/ubuntu/test_batch.bin` | Board copy of `data/test_batch.bin` |
+| `pynq/infer_rtl.py` | `CIFAR_BIN` | `/home/ubuntu/test_batch.bin` | Board copy of `model/test_batch.bin` |
 | `pynq/infer_rtl.py` | `NUM_IMAGES` | 1 | Requested image count, consistent with the packaged design |
 | `pynq/infer_hls.py` | `Overlay(...)` | `/home/ubuntu/hls/cnn_accelerator.xsa` | Your board's HLS overlay path |
-| `pynq/infer_hls.py` | `PARAM_BIN`, `CIFAR_BIN` | Repository-relative model/data paths | Keep the repository layout, or edit these paths |
+| `pynq/infer_hls.py` | `PARAM_BIN`, `CIFAR_BIN` | Repository-relative model input paths | Keep the repository layout, or edit these paths |
 
 Copy the repository to the board for HLS inference so `REPO_ROOT` can resolve
-`model/weights_q6_10.bin` and `data/test_batch.bin`. The RTL application uses the
+`model/weights_q6_10.bin` and `model/test_batch.bin`. The RTL application uses the
 absolute deployment paths in its constants; copy those two inputs there or edit
 the constants to point to your repository checkout.
 
@@ -50,7 +50,7 @@ the compile-time `NUM_IMAGES` from `rtl/cnn_dataflow.v`, and match the DMA strea
 widths and output packing to the board's width converters. Parameters load once
 after RTL reset; repeated calls must follow that weight-loading protocol.
 If using an overlay with the runner's current control interface, match its IP
-name and registers instead. This configuration has not been validated on a board.
+name and registers instead.
 
 Both runners normalize CIFAR-10 inputs and transfer signed Q6.10 parameter/image
-words. Board execution has not been validated for the current repository setup.
+words.
