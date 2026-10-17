@@ -3,6 +3,9 @@
 venv/
 env/
 
+# Dide Extension
+.dide/
+
 # Python caches
 __pycache__/
 *.py[cod]
