@@ -17,6 +17,12 @@
 </p>
 -->
 
+<p align="center">
+  <a href="assets/vnn-architecture.png">
+    <img src="assets/vnn-architecture.png" alt="VNN architecture: system-level pipeline, packed weight organization, and convolutional layer microarchitecture" width="100%">
+  </a>
+</p>
+
 ---
 
 VNN (Verilog Neural Network) is an RTL accelerator for multi-bit fixed-point CNN
