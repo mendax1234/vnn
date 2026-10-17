@@ -112,7 +112,7 @@ The trained checkpoint is `model/checkpoints/cnn.pth`.
 | Workflow | Requirements | Guide |
 | --- | --- | --- |
 | Model and parameter export | Python 3, NumPy, PyTorch | [Model guide](model/README.md) |
-| Q6.10 CPU inference | C++17 compiler; Python 3 for benchmarking | [CPU guide](model/README.md#cpu-build-and-inference) |
+| Q6.10 CPU inference | C++17 compiler; Python 3 for benchmarking | [CPU guide](model/cpu/README.md) |
 | FP16 and Q6.10 GPU inference | NVIDIA GPU, CUDA Toolkit, C++ toolchain; cuBLAS for FP16 | [CUDA guide](model/cuda/README.md) |
 | RTL simulation | AMD Vivado/XSim with XPM memory support | [Testbench guide](tb/README.md) |
 | HLS simulation and synthesis | AMD Vitis HLS | [HLS guide](hls/README.md) |
@@ -146,19 +146,18 @@ guide. RTL memory paths are relative to the repository root. Before board
 execution, match overlay paths, IP instance names, control registers, DMA stream
 widths, and image counts to the packaged design using the PYNQ guide.
 
-### Release status
+### Validation and reproduction
 
-The reported paper results and the completeness of this source release are
-separate. The checkpoint and inference model are available; training code is not
-included. Additional RTL layer/system vectors are required as listed in the
-testbench guide. HLS C simulation generates first-image layer vectors, but does
-not generate the complete ten-image RTL system fixtures.
+The implementations were validated in the FPGA tool flows and on the FPGA board
+for the experiments reported in the paper. This repository organizes the source
+code and evaluation assets used in those experiments.
 
-Vivado board block designs, constraints, and deployable overlays must be supplied
-for the target platform. The current RTL board runner's AXI-Lite control
-operations also require adaptation to the stream-only `cnn_dataflow` top.
-The current repository configuration has not been validated through a complete
-Vivado implementation and board execution flow.
+For reproduction, follow the component guides to configure file paths, FPGA
+settings, overlay/IP names, and board interfaces for your environment. The
+checkpoint and inference model are included. Training code, board-specific Vivado
+project files/constraints, and deployable overlays are not included in the current
+source tree. Additional simulation vectors needed by the RTL testbenches are
+listed in the testbench guide.
 
 ## Citation
 

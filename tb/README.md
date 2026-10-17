@@ -4,8 +4,8 @@ All paths below are relative to the repository root.
 
 | Directory | Purpose |
 | --- | --- |
-| `tb/rtl/unit/` | Six individual fused Conv-ReLU layer tests |
-| `tb/rtl/system/` | Full CNN inference and parameter-loader tests |
+| `tb/rtl/layers/` | Six individual fused Conv-ReLU layer tests |
+| `tb/rtl/accelerator/` | Full CNN inference and parameter-loader tests |
 | `tb/rtl/wrappers/` | AXI-stream interfaces and local memories used to simulate each layer |
 | `tb/hls/` | HLS C simulation testbench |
 | `tb/data/` | Shared parameter tensors and simulation vectors |
@@ -19,7 +19,7 @@ The production design uses the sources under `rtl/`.
 1. Create a Vivado RTL project for the target FPGA.
 2. Add all `.v` files under `rtl/` as Design Sources. Set `cnn_dataflow` as the
    design top.
-3. Add `.v` files under `tb/rtl/unit/`, `tb/rtl/system/`, and
+3. Add `.v` files under `tb/rtl/layers/`, `tb/rtl/accelerator/`, and
    `tb/rtl/wrappers/` as Simulation Sources.
 4. Enable `XPM_MEMORY` in the project for `xpm_memory_tdpram` UltraRAM modules.
 5. Select one simulation top from the table below.
