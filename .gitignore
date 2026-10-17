@@ -15,8 +15,16 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# Zensical / static site output
-site/
+# RTL simulation and FPGA project output
+build/
+*.jou
+*.log
+.Xil/
+
+# Generated model exports
+*.exe
+*.obj
+*.o
 
 # Local environment files
 .env
