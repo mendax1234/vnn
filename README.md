@@ -1,9 +1,7 @@
 <h1 align="center">VNN: A High-Performance RTL Accelerator<br>for Edge CNN Inference on FPGAs</h1>
 
 <p align="center">
-  <strong>Zhu Wenbo, Tan Chou Rong Roel, Ng Joo An Sean, and Rajesh C. Panicker</strong><br>
-  Department of Electrical and Computer Engineering<br>
-  National University of Singapore
+  <strong>Zhu Wenbo, Tan Chou Rong Roel, Ng Joo An Sean, and <a href="https://scholar.google.com.sg/citations?user=CjZGfo8AAAAJ">Rajesh C. Panicker</a></strong>
 </p>
 
 <!-- Replace ARXIV_ID with the paper identifier and uncomment this block after publication.
@@ -25,71 +23,50 @@
 
 ---
 
-VNN (Verilog Neural Network) is an RTL accelerator for multi-bit fixed-point CNN
-inference on edge FPGAs. It coordinates channel parallelism, on-chip memory
-organization, and register-level timing optimization within a layer-wise
-pipelined architecture. The evaluated implementation is a 16-bit Q6.10 CIFAR-10
-classifier on the AMD Kria KV260 Vision AI Starter Kit.
+VNN (Verilog Neural Network) is a high-performance RTL accelerator for multi-bit fixed-point CNN inference on edge FPGAs. It combines layer-wise pipelining, channel parallelism, packed on-chip memory, and register-level timing optimization to achieve high inference throughput under FPGA resource constraints.
+
+Implemented as a 16-bit Q6.10 CIFAR-10 classifier on the AMD Kria KV260 Vision AI Starter Kit, VNN achieves **6,771.3 FPS and 523.2 GOPS at 333 MHz**, with **22.39 GOPS/kLUT** and a Vivado-estimated on-chip power consumption of **3.909 W**, corresponding to **1,732.2 FPS/W and 133.8 GOPS/W**.
+
+## Table of Contents
+
+- [Architecture](#architecture)
+- [Repository structure](#repository-structure)
+- [Getting started](#getting-started)
+- [Citation](#citation)
+- [License](#license)
 
 ## Architecture
 
-VNN combines four architectural techniques:
+VNN combines four architectural techniques to achieve high-throughput CNN inference on FPGAs:
 
-- **Layer-wise pipelining:** dedicated processing stages exchange feature maps
-  through ping-pong buffers, allowing adjacent layers to process different images
-  concurrently.
-- **Channel parallelism:** input- and output-channel unrolling expose parallel
-  arithmetic, with folding mapping channel groups onto the available lanes.
-- **Packed on-chip memory:** word packing and channel folding organize weights
-  into wider, deeper BRAM, URAM, and LUTRAM banks for parallel access and improved
-  memory utilization.
-- **Timing optimization:** localized pipeline-register insertion, control/data
-  alignment, and register replication reduce critical-path and routing delays.
+- **Layer-wise pipelining:** Each CNN layer is mapped to a dedicated processing stage. Adjacent layers exchange intermediate feature maps through ping-pong buffers, enabling concurrent execution across layers on different input images.
+- **Channel parallelism:** Input- and output-channel unrolling exploit arithmetic parallelism within convolutional layers.
+- **Packed on-chip memory:** Word packing combines multiple weights into wider memory words, reducing the number of logical memory banks and improving BRAM/URAM utilization efficiency while maintaining parallel weight access.
+- **Timing optimization:** Localized pipeline-register insertion shortens critical combinational paths while maintaining data/control alignment. Register replication distributes high-fanout loads to alleviate routing-related timing bottlenecks.
 
-The accelerator targets networks whose parameters and intermediate activations
-fit in on-chip memory. Parameters are loaded before an image batch; intermediate
-feature maps remain on chip.
+VNN targets CNNs whose parameters and ping-pong-buffered intermediate feature maps fit within the available on-chip memory. Model parameters are loaded into layer-local RAM once per image batch, while intermediate feature maps remain on chip throughout inference, avoiding repeated off-chip memory accesses.
 
-### Reference network
+### Reference Network
 
-The custom CNN uses six 3 x 3 convolutions with output channels
-32, 32, 64, 64, 128, and 128. Each convolution is followed by ReLU. Max pooling
-after Conv2 and Conv4 reduces the spatial dimensions from 32 x 32 to 8 x 8,
-followed by global average pooling and a ten-class fully connected layer.
-Batch normalization is folded into the convolution parameters during export.
+VNN is evaluated using a custom CNN for CIFAR-10 classification. The network consists of six 3 × 3 convolutional layers following a Conv–BatchNorm–ReLU pattern, with output-channel counts of 32, 32, 64, 64, 128, and 128. Max pooling reduces the spatial dimensions from 32 × 32 to 16 × 16 and then to 8 × 8. The network ends with global average pooling and a fully connected layer for ten-class classification.
 
-The network requires **38,634,752 MACs per image** and **288,298 parameter words**.
-The RTL top module is `cnn_dataflow`; the HLS baseline top is `cnn_accelerator`.
+The network is trained in PyTorch for 200 epochs using the AdamW optimizer with cosine learning rate decay. Training includes input normalization, random cropping, and horizontal flipping. After training, batch normalization is folded into the convolution parameters, and the learned weights are quantized to 16-bit Q6.10 fixed-point representation for FPGA inference. The network architecture is shown as follows:
 
-## Results reported in the paper
+| Layer | Output dimensions | MACs |
+|---|---|---:|
+| Conv2D + ReLU | 32 × 32 × 32 | 884,736 |
+| Conv2D + ReLU | 32 × 32 × 32 | 9,437,184 |
+| MaxPool | 32 × 16 × 16 | – |
+| Conv2D + ReLU | 64 × 16 × 16 | 4,718,592 |
+| Conv2D + ReLU | 64 × 16 × 16 | 9,437,184 |
+| MaxPool | 64 × 8 × 8 | – |
+| Conv2D + ReLU | 128 × 8 × 8 | 4,718,592 |
+| Conv2D + ReLU | 128 × 8 × 8 | 9,437,184 |
+| Global AvgPool | 128 | – |
+| Fully Connected | 10 | 1,280 |
+| **Total** | | **38,634,752** |
 
-The following results compare VNN with the same-network Vitis HLS baseline on
-the Kria KV260, using 16-bit weights and activations and 10,000 images per run.
-These are the paper's implementation results, rather than measurements generated
-by the README examples.
-
-| Metric | HLS baseline | VNN RTL |
-| --- | ---: | ---: |
-| Clock frequency (MHz) | 200 | 333 |
-| CIFAR-10 top-1 accuracy (%) | 89.31 | 89.31 |
-| Throughput (FPS) | 333.1 | **6,771.3** |
-| Throughput (GOPS) | 25.74 | **523.2** |
-| LUTs | 51,052 | 23,371 |
-| BRAM36 equivalents | 120.5 | 141 |
-| URAMs | 36 | 56 |
-| DSPs | 357 | 781 |
-| Estimated on-chip power (W) | 4.98 | 3.909 |
-| Energy efficiency (GOPS/W) | 5.17 | 133.8 |
-
-VNN provides **20.3x higher throughput** with **54.2% fewer LUTs** than this HLS
-baseline, with increased DSP and on-chip memory utilization. Against the board's
-single-threaded Q6.10 ARM Cortex-A53 implementation, the reported throughput
-improvement is **1,546x**.
-
-GOPS counts one MAC as two operations. FPGA timings include parameter loading,
-input/output transfers, and inference, and exclude overlay initialization, file
-loading, and preprocessing. Power values are **Vivado post-implementation on-chip
-estimates**; they are not measurements of total board power.
+The network requires **38,634,752 MACs per image** and **288,298 parameter words**. Each MAC counts as two operations when reporting throughput in GOPS.
 
 ## Repository structure
 
@@ -105,53 +82,68 @@ model/           Model definition, checkpoint, dataset, exporter, and CPU/CUDA b
 pynq/            FPGA board inference applications
 ```
 
-Standalone AXI-stream wrappers for the layer testbenches are in
-`tb/rtl/wrappers/`. Generated executables and hardware project outputs belong
-under ignored `build/` directories.
+## Getting Started
 
-## Getting started
+VNN provides two FPGA implementations of the same CNN: a hand-written RTL accelerator and a Vitis HLS baseline. Both were evaluated on the **AMD Kria KV260 Vision AI Starter Kit** using Vivado for hardware integration and PYNQ for board-level inference.
 
-The FPGA implementations and PYNQ applications were tested on the AMD Kria KV260
-Vision AI Starter Kit.
+The repository contains the accelerator sources, testbenches, trained model, quantized parameters, and inference applications. Vivado block designs, board-specific constraints, and prebuilt overlays are not included and must be configured separately. The following instructions outline the implementation workflows, with references to the NUS EE4218 lab guides for hardware platform setup, IP integration, and PYNQ deployment.
 
-Run commands from the repository root unless a component guide specifies another
-working directory. The included evaluation inputs are `model/test_batch.bin`,
-`model/weights_q6_10.bin`, and fourteen parameter tensors under `tb/data/`.
-The trained checkpoint is `model/checkpoints/cnn.pth`.
+### Prerequisites
 
-| Workflow | Requirements | Guide |
-| --- | --- | --- |
-| Model and parameter export | Python 3, NumPy, PyTorch | [Model guide](model/README.md) |
-| Q6.10 CPU inference | C++17 compiler; Python 3 for benchmarking | [CPU guide](model/cpu/README.md) |
-| FP16 and Q6.10 GPU inference | NVIDIA GPU, CUDA Toolkit, C++ toolchain; cuBLAS for FP16 | [CUDA guide](model/cuda/README.md) |
-| RTL simulation | AMD Vivado/XSim with XPM memory support | [Testbench guide](tb/README.md) |
-| HLS simulation and synthesis | AMD Vitis HLS | [HLS guide](hls/README.md) |
-| Board execution | Kria KV260/PYNQ environment and matching overlay | [PYNQ guide](pynq/README.md) |
+- AMD Vivado Design Suite with support for the Kria KV260
+- AMD Vitis HLS for the HLS implementation
+- Kria KV260 running a compatible Linux/PYNQ environment
+- Python 3, NumPy, and PyTorch for model utilities
+- Required model checkpoint and evaluation data (included in the repository)
 
-Build, inference, and benchmark commands are provided in the component guides.
-Dataset formats and the checksum are in the [data guide](model/README.md#evaluation-data).
+> [!NOTE]
+> This design was validated using AMD Vivado and Vitis 2026.1. While other recent tool versions may be compatible, minor adjustments to constraints or synthesis settings might be required.
 
-## Reproducing the hardware configuration
+### RTL Implementation
 
-The paper evaluates RTL at **333 MHz** and HLS at **200 MHz**. In
-`hls/run_hls.tcl`, configure the FPGA part, `create_clock` period, and simulation
-image count for the target platform. The provided HLS flow defaults to the K26
-part, a 5 ns clock, and one C simulation image. Configure RTL timing and board
-integration in Vivado for the intended operating frequency.
+The RTL accelerator is implemented in Verilog and integrated into the KV260 hardware platform using Vivado IP Integrator.
 
-Select the simulation top and working directory as described in the testbench
-guide. RTL memory paths are relative to the repository root. Before board
-execution, match overlay paths, IP instance names, control registers, DMA stream
-widths, and image counts to the packaged design using the PYNQ guide.
+1. **Create the Vivado project.** Follow the [EE4218 hardware platform guide](https://nus-ee4218.github.io/Lab_2/2_HW_Platform/) to create a KV260 project and configure the Zynq UltraScale+ MPSoC processing system, clocks, resets, and AXI interfaces.
+2. **Package the RTL accelerator.** Import the Verilog sources under `rtl/`, including the required interface and utility modules, and package them as a custom Vivado IP. Refer to the [EE4218 IP packaging guide](https://nus-ee4218.github.io/Lab_3/2_PackagingIP/) for the procedure.
+3. **Integrate the accelerator.** Add the custom IP and AXI DMA to the Vivado block design. Configure the AXI-Stream connections for input images, model parameters, and inference results, together with the required memory and control interfaces. Follow the [EE4218 AXI DMA integration guide](https://nus-ee4218.github.io/Lab_3/4_DMA/) for the general integration procedure, adapting the connections and interface settings to VNN.
+4. **Implement the hardware.** Validate the block design, generate the HDL wrapper, and run synthesis, implementation, and bitstream generation. Apply the required timing constraints and implementation settings. The RTL implementation reported in the paper achieves **333 MHz**.
+5. **Export and deploy.** Export the Vivado hardware platform as an XSA with the bitstream included. Transfer the generated `.bit` and `.hwh` files to the KV260 and configure the corresponding overlay paths and IP interfaces. Refer to the [EE4218 PYNQ on Kria guide](https://nus-ee4218.github.io/Lab_4/4_Pynq_OpenCL_Kria/) for board setup and PYNQ deployment.
+6. **Run inference.** Execute `pynq/infer_hdl.py` on the KV260 using the required quantized parameters and evaluation images. See the [PYNQ guide](pynq/README.md) for application-specific configuration and execution.
 
-### Required artifacts
+RTL simulation and verification can be performed using the testbenches under `tb/rtl/`. Refer to the [testbench guide](tb/README.md) for additional details.
 
-For reproduction, follow the component guides to configure file paths, FPGA
-settings, overlay/IP names, and board interfaces for your environment. The
-checkpoint and inference model are included. Training code, board-specific Vivado
-project files/constraints, and deployable overlays are not included in the current
-source tree. Additional simulation vectors needed by the RTL testbenches are
-listed in the testbench guide.
+### HLS Implementation
+
+The HLS baseline implements the same CNN in C++ and uses Vitis HLS to generate RTL for integration into the KV260 hardware platform.
+
+1. **Create the HLS project.** Follow the [EE4218 HLS flow guide](https://nus-ee4218.github.io/Lab_4/2_HLSFLow/) to create a Vitis HLS component targeting the KV260 (K26 FPGA). Import the C++ sources, header files, and testbench under `hls/`, and specify the HLS top function.
+2. **Configure and verify the design.** Set the target clock period to **5 ns (200 MHz)**, as used in the paper. Run C simulation to verify functionality, followed by C synthesis to generate RTL and obtain timing and resource estimates. C/RTL co-simulation can be performed for additional verification.
+3. **Package the HLS IP.** Package the synthesized design in Vivado IP catalog format for integration into a Vivado block design. Refer to the [EE4218 HLS flow guide](https://nus-ee4218.github.io/Lab_4/2_HLSFLow/) for IP packaging and export.
+4. **Integrate and implement in Vivado.** Create a KV260 Vivado project following the [hardware platform guide](https://nus-ee4218.github.io/Lab_2/2_HW_Platform/), add the exported HLS IP to the IP repository, and integrate it with the Zynq UltraScale+ MPSoC and AXI DMA following the [AXI DMA integration guide](https://nus-ee4218.github.io/Lab_3/4_DMA/). Configure the required interfaces and run synthesis, implementation, and bitstream generation.
+5. **Export and deploy.** Export the Vivado hardware platform as an XSA with the bitstream included. Transfer the XSA file to the KV260 and configure the corresponding PYNQ overlay. Refer to the [EE4218 PYNQ on Kria guide](https://nus-ee4218.github.io/Lab_4/4_Pynq_OpenCL_Kria/) for deployment instructions.
+6. **Run inference.** Execute `pynq/infer_hls.py` on the KV260 using the same quantized model and evaluation dataset as the RTL implementation. See the [PYNQ guide](pynq/README.md) for application-specific configuration and execution.
+
+Refer to the [HLS guide](hls/README.md) for further details on the HLS sources and synthesis flow, and the [testbench guide](tb/README.md) for simulation.
+
+### Model and Evaluation Data
+
+The repository includes the trained model and supporting evaluation files:
+
+| Artifact | Location |
+|---|---|
+| Trained PyTorch checkpoint | `model/checkpoints/cnn.pth` |
+| Quantized model parameters | `model/weights_q6_10.bin` |
+| Evaluation image batch | `model/test_batch.bin` |
+| RTL simulation parameters and vectors | `tb/data/` |
+
+Additional documentation is available for model preparation and CPU/GPU inference implementations used for performance comparison:
+
+- [Model and data preparation](model/README.md)
+- [CPU inference](model/cpu/README.md)
+- [CUDA inference](model/cuda/README.md)
+
+> [!NOTE]
+> The FPGA flows above describe the integration and deployment procedure rather than an automated, one-command reproduction. Reproducing the reported results requires compatible tool versions, hardware settings, memory initialization files, and PYNQ overlay configurations. The RTL and HLS implementations reported in the paper operate at 333 MHz and 200 MHz, respectively; achieved timing may differ with implementation settings and tool versions.
 
 ## Citation
 
