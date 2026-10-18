@@ -71,11 +71,11 @@ and FC biases. Interpret a Q6.10 word as its signed integer value divided by 102
 
 Run CPU and CUDA commands with explicit dataset and parameter arguments, as shown
 in their component guides. The HLS flow uses `tb/data/` and `model/test_batch.bin`;
-change `mem_dir` and `cifar_bin` in `hls/run_hls.tcl` for other locations.
+set their absolute paths in the Vitis C Simulation arguments as described in
+[the HLS guide](../hls/README.md).
 
-For PYNQ HLS inference, retain the repository layout on the board. For the RTL
-runner, copy the dataset and parameter blob to its configured absolute paths or
-edit `CIFAR_BIN` and `PARAM_BIN` in `pynq/infer_rtl.py`. See
+For PYNQ inference, copy the dataset and parameter blob to the configured absolute
+paths or edit `CIFAR_BIN` and `PARAM_BIN` in the corresponding runner. See
 [board configuration](../pynq/README.md) for overlay and IP requirements.
 
 Additional RTL simulation vectors are not included. Their filenames and required
