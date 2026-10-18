@@ -1,5 +1,4 @@
 from pynq import Overlay, allocate
-from pathlib import Path
 import numpy as np
 import time
 import sys
@@ -11,9 +10,8 @@ ip      = overlay.cnn_accelerator_0   # packaged from hls/cnn_accelerator.cpp
 
 
 # ── CIFAR-10 constants ───────────────────────────────────────────────────────
-REPO_ROOT = Path(__file__).resolve().parents[1]
-CIFAR_BIN  = REPO_ROOT / "model/test_batch.bin"
-PARAM_BIN  = REPO_ROOT / "model/weights_q6_10.bin"
+CIFAR_BIN  = "/home/ubuntu/test_batch.bin"
+PARAM_BIN  = "/home/ubuntu/weights_biases_int16.bin"
 
 DEFAULT_NUM_IMAGES = 10000
 if len(sys.argv) > 1:
