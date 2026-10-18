@@ -63,10 +63,10 @@ module tb_cnn_dataflow ();
     initial begin
         $display("Loading Memory into Testbench...");
         $fflush();
-        // Add both .mem files to Vivado's Simulation Sources.  Vivado copies
-        // them into the xsim run directory, where these basename paths resolve.
-        $readmemh("tb/data/system/test_input_v2_10.mem", test_input_memory);
-        $readmemh("tb/data/system/test_result_expected_v2_10.mem", test_result_expected_memory);
+        // Paths are relative to the repository root. For a Vivado GUI project,
+        // set these to the absolute locations of the supplied vector files.
+        $readmemh("tb/data/system/test_input_10.mem", test_input_memory);
+        $readmemh("tb/data/system/test_result_expected_10.mem", test_result_expected_memory);
 
         ARESETN = 1'b0;
         S_AXIS_TVALID = 1'b0;
