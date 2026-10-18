@@ -1,7 +1,8 @@
 <h1 align="center">VNN: A High-Performance RTL Accelerator<br>for Edge CNN Inference on FPGAs</h1>
 
 <p align="center">
-  <strong>Zhu Wenbo, Tan Chou Rong Roel, Ng Joo An Sean, and <a href="https://scholar.google.com.sg/citations?user=CjZGfo8AAAAJ">Rajesh C. Panicker</a></strong>
+  <strong>Zhu Wenbo, Tan Chou Rong Roel, Ng Joo An Sean, and <a href="https://scholar.google.com.sg/citations?user=CjZGfo8AAAAJ">Rajesh C. Panicker</a></strong><br>
+  Department of Electrical and Computer Engineering, National University of Singapore
 </p>
 
 <!-- Replace ARXIV_ID with the paper identifier and uncomment this block after publication.
