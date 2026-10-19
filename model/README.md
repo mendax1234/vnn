@@ -1,9 +1,30 @@
-# CNN model and parameter export
+# CNN architecture and parameter export
 
-The model has six 3x3 convolutions with channels 32, 32, 64, 64, 128, and 128.
-Max pooling follows Conv2 and Conv4, then global average pooling and a 10-class
-fully connected layer. Parameters are exported with BatchNorm folded into the
-convolutions.
+## Network architecture
+
+The CNN takes a CIFAR-10 image with dimensions 3 × 32 × 32 and produces ten
+class scores. Output dimensions below use channel-height-width order (C × H × W),
+with the batch dimension omitted.
+
+| Layer type | Output dimensions | MACs |
+| --- | --- | ---: |
+| Conv2D + ReLU | 32 × 32 × 32 | 884,736 |
+| Conv2D + ReLU | 32 × 32 × 32 | 9,437,184 |
+| MaxPool | 32 × 16 × 16 | – |
+| Conv2D + ReLU | 64 × 16 × 16 | 4,718,592 |
+| Conv2D + ReLU | 64 × 16 × 16 | 9,437,184 |
+| MaxPool | 64 × 8 × 8 | – |
+| Conv2D + ReLU | 128 × 8 × 8 | 4,718,592 |
+| Conv2D + ReLU | 128 × 8 × 8 | 9,437,184 |
+| Global AvgPool | 128 | – |
+| Fully Connected | 10 | 1,280 |
+| **Total** | | **38,634,752** |
+
+Each convolution uses a 3 × 3 kernel, stride 1, and padding 1. Max pooling uses
+a 2 × 2 window with stride 2. BatchNorm is folded into the convolution parameters
+for inference, and each convolution includes ReLU activation. The MAC count covers
+convolutions and the fully connected layer; one MAC counts as two operations when
+reporting throughput in GOPS.
 
 ## Files and parameters
 
@@ -15,7 +36,6 @@ convolutions.
 | `model/weights_q6_10.bin` | 288,298 little-endian signed int16 parameter words |
 | `model/cpu/` | Q6.10 CPU inference and benchmarking |
 | `model/cuda/` | FP16 and Q6.10 CUDA inference |
-| `tb/data/` | The same parameters as 14 tensor hex files |
 
 Training code is not included. Build and execution instructions are separated by
 implementation:
@@ -54,13 +74,11 @@ channel-height-width order (`3 x 32 x 32`).
 
 SHA-256: `8e2eb146ae340b09e24670f29cabc6326dba54da8789dab6768acf480273f65b`
 
-### CNN-V2 parameters
+### Model parameters
 
 | File | Format | Use |
 | --- | --- | --- |
 | `model/weights_q6_10.bin` | 288,298 little-endian signed int16 words; 576,596 bytes | CPU, CUDA Q6.10, and PYNQ inference |
-| `tb/data/conv1_w.mem` through `conv6_w.mem`, plus `fc_w.mem` | One 16-bit hexadecimal word per line | HLS and RTL simulation weights |
-| `tb/data/conv1_b.mem` through `conv6_b.mem`, plus `fc_b.mem` | One 16-bit hexadecimal word per line | HLS and RTL simulation biases |
 | `model/checkpoints/cnn.pth` | PyTorch checkpoint | Parameter export |
 | `model/cuda/weights.h` | Float arrays with Q6.10-rounded values | CUDA FP16 build |
 
@@ -70,13 +88,8 @@ and FC biases. Interpret a Q6.10 word as its signed integer value divided by 102
 ### Choose input paths
 
 Run CPU and CUDA commands with explicit dataset and parameter arguments, as shown
-in their component guides. The HLS flow uses `tb/data/` and `model/test_batch.bin`;
-set their absolute paths in the Vitis C Simulation arguments as described in
-[the HLS guide](../hls/README.md).
+in their component guides.
 
 For PYNQ inference, copy the dataset and parameter blob to the configured absolute
 paths or edit `CIFAR_BIN` and `PARAM_BIN` in the corresponding runner. See
 [board configuration](../pynq/README.md) for overlay and IP requirements.
-
-Additional RTL simulation vectors are not included. Their filenames and required
-locations are listed in [the testbench guide](../tb/README.md#required-data).
