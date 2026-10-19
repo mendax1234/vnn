@@ -5,6 +5,16 @@ generation and the simplified microarchitectures of the all the layers used in a
 See [the model guide](../model/README.md#network-architecture) for the network
 architecture and [the testbench guide](../tb/README.md) for simulation setup.
 
+## Table of Contents
+
+- [Motivation](#motivation)
+- [Simplified Layer Microarchitectures](#simplified-layer-microarchitectures)
+  - [Convolution Layer](#convolution-layer)
+  - [Max Pooling Layer](#max-pooling-layer)
+  - [Average Pooling Layer](#average-pooling-layer)
+  - [Fully Connected Layer](#fully-connected-layer)
+  - [ReLU Layer](#relu-layer)
+
 ## Motivation
 
 ### Drawing Inspiration from Microprocessor Design
