@@ -1,7 +1,8 @@
 # RTL design and microarchitecture
 
-This guide explains the motivation behind the RTL design, followed by address
-generation and the simplified microarchitectures of the all the layers used in a CNN network.
+This guide introduces the design principles behind VNN's RTL implementation,
+from control logic and address generation to datapath design. It then illustrates
+how these building blocks fit together in simplified microarchitectures for each CNN layer.
 See [the model guide](../model/README.md#network-architecture) for the network
 architecture and [the testbench guide](../tb/README.md) for simulation setup.
 
@@ -70,7 +71,7 @@ When the AGU is simply a wire, the counter output is directly connected to the m
 Assuming we are using synchronous-read memory, such as Block RAM (BRAM), the timing diagram is shown below.
 
 <p align="center">
-  <img src="../assets/agu_direct_mapping.png" alt="Timing diagram: AGU implemented as a wire">
+  <img src="../assets/agu_direct_mapping.png" alt="Timing diagram: AGU implemented as a wire" width="650">
 </p>
 
 #### Combinational Address Generation
@@ -78,7 +79,7 @@ Assuming we are using synchronous-read memory, such as Block RAM (BRAM), the tim
 When the AGU is implemented as a combinational circuit, it performs additional address calculations based on the counter values before feeding the resulting addresses into memory.
 
 <p align="center">
-  <img src="../assets/agu_combinational_mapping.png" alt="Timing diagram: AGU implemented as a combinational circuit">
+  <img src="../assets/agu_combinational_mapping.png" alt="Timing diagram: AGU implemented as a combinational circuit" width="650">
 </p>
 
 One important point to remember is that, for synchronous-read RAM, the data corresponding to an address is available after the active clock edge at which the address is sampled.
@@ -117,7 +118,7 @@ The convolution layer is implemented using a pipelined multiply-accumulate (MAC)
 #### Convolution with LUTRAM (RAM A)
 
 <p align="center">
-  <img src="../assets/conv_lutram_microarchitecture.png" alt="Simplified convolution microarchitecture with LUTRAM-based input memory">
+  <img src="../assets/conv_lutram_microarchitecture.png" alt="Simplified convolution microarchitecture with LUTRAM-based input memory" width="100%">
 </p>
 
 <p align="center"><em>Figure 1: Simplified convolution microarchitecture with LUTRAM-based input memory.</em></p>
@@ -125,7 +126,7 @@ The convolution layer is implemented using a pipelined multiply-accumulate (MAC)
 #### Convolution with BRAM/URAM (RAM A)
 
 <p align="center">
-  <img src="../assets/conv_bram_uram_microarchitecture.png" alt="Simplified convolution microarchitecture with BRAM/URAM-based input memory">
+  <img src="../assets/conv_bram_uram_microarchitecture.png" alt="Simplified convolution microarchitecture with BRAM/URAM-based input memory" width="100%">
 </p>
 
 <p align="center"><em>Figure 2: Simplified convolution microarchitecture with BRAM/URAM-based input memory.</em></p>
@@ -133,7 +134,7 @@ The convolution layer is implemented using a pipelined multiply-accumulate (MAC)
 ### Max Pooling Layer
 
 <p align="center">
-  <img src="../assets/maxpool_microarchitecture.png" alt="Simplified max pooling microarchitecture">
+  <img src="../assets/maxpool_microarchitecture.png" alt="Simplified max pooling microarchitecture" width="650">
 </p>
 
 <p align="center"><em>Figure 3: Simplified max pooling microarchitecture.</em></p>
@@ -141,7 +142,7 @@ The convolution layer is implemented using a pipelined multiply-accumulate (MAC)
 ### Average Pooling Layer
 
 <p align="center">
-  <img src="../assets/avgpool_microarchitecture.png" alt="Simplified average pooling microarchitecture">
+  <img src="../assets/avgpool_microarchitecture.png" alt="Simplified average pooling microarchitecture" width="650">
 </p>
 
 <p align="center"><em>Figure 4: Simplified average pooling microarchitecture.</em></p>
@@ -149,7 +150,7 @@ The convolution layer is implemented using a pipelined multiply-accumulate (MAC)
 ### Fully Connected Layer
 
 <p align="center">
-  <img src="../assets/fc_argmax_microarchitecture.png" alt="Simplified fully connected microarchitecture with argmax">
+  <img src="../assets/fc_argmax_microarchitecture.png" alt="Simplified fully connected microarchitecture with argmax" width="100%">
 </p>
 
 <p align="center"><em>Figure 5: Simplified fully connected microarchitecture.</em></p>
@@ -157,7 +158,7 @@ The convolution layer is implemented using a pipelined multiply-accumulate (MAC)
 ### ReLU Layer
 
 <p align="center">
-  <img src="../assets/relu_microarchitecture.png" alt="Simplified ReLU microarchitecture">
+  <img src="../assets/relu_microarchitecture.png" alt="Simplified ReLU microarchitecture" width="600">
 </p>
 
 <p align="center"><em>Figure 6: Simplified ReLU microarchitecture.</em></p>
