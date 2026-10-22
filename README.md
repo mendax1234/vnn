@@ -49,20 +49,20 @@ VNN targets CNNs whose parameters and ping-pong-buffered intermediate feature ma
 
 ### Reference Network
 
-VNN is evaluated using a custom CNN for CIFAR-10 classification. The network consists of six 3 × 3 convolutional layers following a Conv–BatchNorm–ReLU pattern, with output-channel counts of 32, 32, 64, 64, 128, and 128. Max pooling reduces the spatial dimensions from 32 × 32 to 16 × 16 and then to 8 × 8. The network ends with global average pooling and a fully connected layer for ten-class classification.
+VNN is evaluated using a custom CNN for CIFAR-10 classification, achieving 89.31% accuracy. The network consists of six $3 \times 3$ convolutional layers following a Conv–BatchNorm–ReLU pattern, with output-channel counts of 32, 32, 64, 64, 128, and 128. Max pooling reduces the spatial dimensions from $32 \times 32$ to $16 \times 16$ and then to $8 \times 8$. The network ends with global average pooling and a fully connected layer for ten-class classification.
 
 The network is trained in PyTorch for 200 epochs using the AdamW optimizer with cosine learning rate decay. Training includes input normalization, random cropping, and horizontal flipping. After training, batch normalization is folded into the convolution parameters, and the learned weights are quantized to 16-bit Q6.10 fixed-point representation for FPGA inference. The network architecture is shown as follows:
 
 | Layer | Output dimensions | MACs |
 |---|---|---:|
-| Conv2D + ReLU | 32 × 32 × 32 | 884,736 |
-| Conv2D + ReLU | 32 × 32 × 32 | 9,437,184 |
-| MaxPool | 32 × 16 × 16 | – |
-| Conv2D + ReLU | 64 × 16 × 16 | 4,718,592 |
-| Conv2D + ReLU | 64 × 16 × 16 | 9,437,184 |
-| MaxPool | 64 × 8 × 8 | – |
-| Conv2D + ReLU | 128 × 8 × 8 | 4,718,592 |
-| Conv2D + ReLU | 128 × 8 × 8 | 9,437,184 |
+| Conv2D + ReLU | $32 \times 32 \times 32$ | 884,736 |
+| Conv2D + ReLU | $32 \times 32 \times 32$ | 9,437,184 |
+| MaxPool | $32 \times 16 \times 16$ | – |
+| Conv2D + ReLU | $64 \times 16 \times 16$ | 4,718,592 |
+| Conv2D + ReLU | $64 \times 16 \times 16$ | 9,437,184 |
+| MaxPool | $64 \times 8 \times 8$ | – |
+| Conv2D + ReLU | $128 \times 8 \times 8$ | 4,718,592 |
+| Conv2D + ReLU | $128 \times 8 \times 8$ | 9,437,184 |
 | Global AvgPool | 128 | – |
 | Fully Connected | 10 | 1,280 |
 | **Total** | | **38,634,752** |
