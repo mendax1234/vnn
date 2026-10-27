@@ -5,22 +5,13 @@
   Department of Electrical and Computer Engineering, National University of Singapore
 </p>
 
-<!-- Replace ARXIV_ID with the paper identifier and uncomment this block after publication.
-<p align="center">
-  <a href="https://arxiv.org/abs/ARXIV_ID">
-    <img src="https://img.shields.io/badge/arXiv-Paper-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white" alt="arXiv Paper">
-  </a>
-  <a href="https://arxiv.org/pdf/ARXIV_ID">
-    <img src="https://img.shields.io/badge/arXiv-PDF-red?style=for-the-badge&logo=arxiv&logoColor=white" alt="arXiv PDF">
-  </a>
-</p>
--->
-
+<!-- Temporarily hide the architecture figure while the paper is under review.
 <p align="center">
   <a href="assets/vnn-architecture.png">
     <img src="assets/vnn-architecture.png" alt="VNN architecture: system-level pipeline, packed weight organization, and convolutional layer microarchitecture" width="100%">
   </a>
 </p>
+-->
 
 ---
 
@@ -33,7 +24,6 @@ Implemented as a 16-bit Q6.10 CIFAR-10 classifier on the AMD Kria KV260 Vision A
 - [Architecture](#architecture)
 - [Repository structure](#repository-structure)
 - [Getting started](#getting-started)
-- [Citation](#citation)
 - [License](#license)
 
 ## Architecture
@@ -107,7 +97,7 @@ The RTL accelerator is implemented in Verilog and integrated into the KV260 hard
 1. **Create the Vivado project.** Follow the [EE4218 hardware platform guide](https://nus-ee4218.github.io/Lab_2/2_HW_Platform/) to create a KV260 project and configure the Zynq UltraScale+ MPSoC processing system, clocks, resets, and AXI interfaces.
 2. **Package the RTL accelerator.** Import the Verilog sources under `rtl/`, including the required interface and utility modules, and package them as a custom Vivado IP. See the [RTL design guide](rtl/README.md) for the design motivation and simplified layer microarchitectures, and the [EE4218 IP packaging guide](https://nus-ee4218.github.io/Lab_3/2_PackagingIP/) for the packaging procedure.
 3. **Integrate the accelerator.** Add the custom IP and AXI DMA to the Vivado block design. Configure the AXI-Stream connections for input images, model parameters, and inference results, together with the required memory and control interfaces. Follow the [EE4218 AXI DMA integration guide](https://nus-ee4218.github.io/Lab_3/4_DMA/) for the general integration procedure, adapting the connections and interface settings to VNN.
-4. **Implement the hardware.** Validate the block design, generate the HDL wrapper, and run synthesis, implementation, and bitstream generation. Apply the required timing constraints and implementation settings. The RTL implementation reported in the paper achieves **333 MHz**.
+4. **Implement the hardware.** Validate the block design, generate the HDL wrapper, and run synthesis, implementation, and bitstream generation. Apply the required timing constraints and implementation settings. The evaluated RTL implementation achieves **333 MHz**.
 5. **Export and deploy.** Export the Vivado hardware platform as an XSA with the bitstream included. Transfer the generated `.bit` and `.hwh` files to the KV260 and configure the corresponding overlay paths and IP interfaces. Refer to the [EE4218 PYNQ on Kria guide](https://nus-ee4218.github.io/Lab_4/4_Pynq_OpenCL_Kria/) for board setup and PYNQ deployment.
 6. **Run inference.** Execute `pynq/infer_hdl.py` on the KV260 using the required quantized parameters and evaluation images. See the [PYNQ guide](pynq/README.md) for application-specific configuration and execution.
 
@@ -118,7 +108,7 @@ RTL simulation and verification can be performed using the testbenches under `tb
 The HLS baseline implements the same CNN in C++ and uses Vitis HLS to generate RTL for integration into the KV260 hardware platform.
 
 1. **Create the HLS project.** Follow the [EE4218 HLS flow guide](https://nus-ee4218.github.io/Lab_4/2_HLSFLow/) to create a Vitis HLS component targeting the KV260 (K26 FPGA). Import the C++ sources, header files, and testbench under `hls/`, and specify the HLS top function.
-2. **Configure and verify the design.** Set the target clock period to **5 ns (200 MHz)**, as used in the paper. Run C simulation to verify functionality, followed by C synthesis to generate RTL and obtain timing and resource estimates. C/RTL co-simulation can be performed for additional verification.
+2. **Configure and verify the design.** Set the target clock period to **5 ns (200 MHz)**, as used in the evaluated HLS implementation. Run C simulation to verify functionality, followed by C synthesis to generate RTL and obtain timing and resource estimates. C/RTL co-simulation can be performed for additional verification.
 3. **Package the HLS IP.** Package the synthesized design in Vivado IP catalog format for integration into a Vivado block design. Refer to the [EE4218 HLS flow guide](https://nus-ee4218.github.io/Lab_4/2_HLSFLow/) for IP packaging and export.
 4. **Integrate and implement in Vivado.** Create a KV260 Vivado project following the [hardware platform guide](https://nus-ee4218.github.io/Lab_2/2_HW_Platform/), add the exported HLS IP to the IP repository, and integrate it with the Zynq UltraScale+ MPSoC and AXI DMA following the [AXI DMA integration guide](https://nus-ee4218.github.io/Lab_3/4_DMA/). Configure the required interfaces and run synthesis, implementation, and bitstream generation.
 5. **Export and deploy.** Export the Vivado hardware platform as an XSA with the bitstream included. Transfer the XSA file to the KV260 and configure the corresponding PYNQ overlay. Refer to the [EE4218 PYNQ on Kria guide](https://nus-ee4218.github.io/Lab_4/4_Pynq_OpenCL_Kria/) for deployment instructions.
@@ -144,18 +134,10 @@ Additional documentation is available for model preparation and CPU/GPU inferenc
 - [CUDA inference](model/cuda/README.md)
 
 > [!NOTE]
-> The FPGA flows above describe the integration and deployment procedure rather than an automated, one-command reproduction. Reproducing the reported results requires compatible tool versions, hardware settings, memory initialization files, and PYNQ overlay configurations. The RTL and HLS implementations reported in the paper operate at 333 MHz and 200 MHz, respectively; achieved timing may differ with implementation settings and tool versions.
-
-## Citation
-
-```bibtex
-@misc{zhu2026vnn,
-  title  = {VNN: A High-Performance RTL Accelerator for Edge CNN Inference on FPGAs},
-  author = {Zhu, Wenbo and Tan, Chou Rong Roel and Ng, Joo An Sean and Panicker, Rajesh C.},
-  year   = {2026}
-}
-```
+> The FPGA flows above describe the integration and deployment procedure rather than an automated, one-command reproduction. Reproducing the reported results requires compatible tool versions, hardware settings, memory initialization files, and PYNQ overlay configurations. The evaluated RTL and HLS implementations operate at 333 MHz and 200 MHz, respectively; achieved timing may differ with implementation settings and tool versions.
 
 ## License
 
-The code is released under the [MIT License](LICENSE).
+Unless otherwise indicated, the project code is released under the [MIT License](LICENSE).
+
+The included CIFAR-10 evaluation data (`model/test_batch.bin` and image vectors under `tb/data/`) is third-party data, not covered by the project's MIT license. See the [original CIFAR-10 dataset page](https://www.cs.toronto.edu/~kriz/cifar.html) for provenance.
